@@ -1,5 +1,5 @@
 {
-  "name": "url-store",
+  "name": "@jimkang/url-store",
   "type": "module",
   "version": "1.0.0",
   "description": "Gets, sets, and syncs state from the URL hash and an internal dictionary. Calls your callback when it changes.",
