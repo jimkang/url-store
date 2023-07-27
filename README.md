@@ -8,7 +8,7 @@ This is an ES modules version of [route-state](https://github.com/jimkang/route-
 
 # Installation
 
-    npm install url-store
+    npm install @jimkang/url-store
 
 # Usage
 
