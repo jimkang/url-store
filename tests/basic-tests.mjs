@@ -24,7 +24,7 @@ function readFromHashTest(t) {
         pushState(a, b, url) {
           t.equal(
             url,
-            'https//cat.net/hey#flying=yes&count=5&name=birds&level=1.5&dancing=no',
+            'https://cat.net/hey#flying=yes&count=5&name=birds&level=1.5&dancing=no',
           );
         },
       },
@@ -67,7 +67,7 @@ function updateHashTest(t) {
 
           t.equal(
             url,
-            'https//cat.net/hey#flying=no&count=5&name=birds&level=3&squirrelCount=2',
+            'https://cat.net/hey#flying=no&count=5&name=birds&level=3&squirrelCount=2',
           );
         },
       },

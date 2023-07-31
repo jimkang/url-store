@@ -60,7 +60,7 @@ export function URLStore({
 
     var updatedURL =
       windowObject.location.protocol +
-      '//' +
+      '://' +
       windowObject.location.host +
       windowObject.location.pathname +
       '#' +
