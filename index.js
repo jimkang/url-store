@@ -8,6 +8,7 @@ export function URLStore({
   defaults = {},
   windowObject,
   boolKeys = [],
+  // TODO: numberKeys
 }) {
   // This is where we keep stuff that's only meant to be in-memory
   // and shouldn't be persisted.
@@ -50,13 +51,12 @@ export function URLStore({
       defaults,
       qs.parse(windowObject.location.hash.slice(1)),
     );
-    var processedState = postProcessAfterDeserialization(state, boolKeys);
-    return processedState;
+    return processBoolsAfterDeserialization(state, boolKeys);
   }
 
   // params: Record<string, unknown>
   function saveToPersistence(params) {
-    var dictCopy = prepareParamsForSerialization(params, boolKeys);
+    var dictCopy = prepareBoolsForSerialization(cloneDeep(params), boolKeys);
 
     var updatedURL =
       windowObject.location.protocol +
@@ -79,9 +79,7 @@ export function URLStore({
   }
 }
 
-function prepareParamsForSerialization(params, boolKeys) {
-  var dictCopy = cloneDeep(params);
-
+function prepareBoolsForSerialization(dictCopy, boolKeys) {
   for (var i = 0; i < boolKeys.length; ++i) {
     const prop = boolKeys[i];
     let val = dictCopy[prop];
@@ -95,7 +93,7 @@ function prepareParamsForSerialization(params, boolKeys) {
   return dictCopy;
 }
 
-function postProcessAfterDeserialization(params, boolKeys) {
+function processBoolsAfterDeserialization(params, boolKeys) {
   for (var i = 0; i < boolKeys.length; ++i) {
     const prop = boolKeys[i];
     let val = params[prop];
