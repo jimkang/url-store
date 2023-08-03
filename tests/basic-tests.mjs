@@ -16,7 +16,7 @@ function readFromHashTest(t) {
     boolKeys: ['flying', 'dancing'],
     windowObject: {
       location: {
-        protocol: 'https',
+        protocol: 'https:',
         host: 'cat.net',
         pathname: '/hey',
         hash: '#count=5&name=birds&level=1.5&dancing=no',
@@ -25,7 +25,7 @@ function readFromHashTest(t) {
         pushState(a, b, url) {
           t.equal(
             url,
-            'https://cat.net/hey#flying=yes&count=5&name=birds&level=1.5&dancing=no',
+            'https://cat.net/hey#count=5&dancing=no&flying=yes&level=1.5&name=birds',
           );
         },
       },
@@ -48,7 +48,7 @@ function readFromHashTest(t) {
 
 function updateHashTest(t) {
   var location = {
-    protocol: 'https',
+    protocol: 'https:',
     host: 'cat.net',
     pathname: '/hey',
     hash: '#count=5&name=birds&level=1.5',
@@ -68,7 +68,7 @@ function updateHashTest(t) {
 
           t.equal(
             url,
-            'https://cat.net/hey#flying=no&count=5&name=birds&level=3&squirrelCount=2',
+            'https://cat.net/hey#count=5&flying=no&level=3&name=birds&squirrelCount=2',
           );
         },
       },
@@ -91,9 +91,9 @@ function updateHashTest(t) {
 
 function copyFromSearchTest(t) {
   var location = {
-    protocol: 'https',
-    host: 'cat.net',
-    pathname: '/hey',
+    protocol: 'http:',
+    host: 'cat.net:8000',
+    pathname: '',
     search: '?count=5&name=birds&level=1.5',
   };
 
@@ -110,20 +110,27 @@ function copyFromSearchTest(t) {
           // Could revisit this later, but defaults are only applied on gets.
           t.equal(
             url,
-            'https://cat.net/hey#count=5&name=birds&level=1.5&flying=no',
+            'http://cat.net:8000#count=5&flying=no&level=1.5&name=birds',
           );
         },
       },
     },
   });
 
-  urlStore.moveSearchToHash();
-
-  t.deepEqual(urlStore.getFromPersistence(), {
+  var expectedState = {
     count: '5',
     name: 'birds',
     level: '1.5',
     flying: false,
-  });
+  };
+
+  urlStore.moveSearchToHash();
+
+  t.deepEqual(urlStore.getFromPersistence(), expectedState);
+
+  // Trigger another save. The pushState hash and the state should be the same.
+  urlStore.update({});
+  t.deepEqual(urlStore.getFromPersistence(), expectedState);
+
   t.end();
 }

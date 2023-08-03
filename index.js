@@ -60,11 +60,11 @@ export function URLStore({
 
     var updatedURL =
       windowObject.location.protocol +
-      '://' +
+      '//' +
       windowObject.location.host +
       windowObject.location.pathname +
       '#' +
-      qs.stringify(dictCopy);
+      qs.stringify(dictCopy, { sort: basicSort });
 
     // Sync URL without triggering onhashchange.
     windowObject.history.pushState(null, '', updatedURL);
@@ -102,6 +102,10 @@ function processBoolsAfterDeserialization(params, boolKeys) {
     }
   }
   return params;
+}
+
+function basicSort(a, b) {
+  return a < b ? -1 : 1;
 }
 
 export default { URLStore };
