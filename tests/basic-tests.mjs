@@ -5,6 +5,7 @@ var { URLStore } = URLStorePkg;
 
 test('Read from hash', readFromHashTest);
 test('Update hash', updateHashTest);
+test('Copy from search', copyFromSearchTest);
 
 function readFromHashTest(t) {
   var urlStore = URLStore({
@@ -86,4 +87,43 @@ function updateHashTest(t) {
     });
     t.end();
   }
+}
+
+function copyFromSearchTest(t) {
+  var location = {
+    protocol: 'https',
+    host: 'cat.net',
+    pathname: '/hey',
+    search: '?count=5&name=birds&level=1.5',
+  };
+
+  var urlStore = URLStore({
+    defaults: {
+      flying: true,
+    },
+    boolKeys: ['flying'],
+    windowObject: {
+      location,
+      history: {
+        pushState(a, b, url) {
+          location.hash = '#' + url.split('#')[1];
+          // Could revisit this later, but defaults are only applied on gets.
+          t.equal(
+            url,
+            'https://cat.net/hey#count=5&name=birds&level=1.5&flying=no',
+          );
+        },
+      },
+    },
+  });
+
+  urlStore.moveSearchToHash();
+
+  t.deepEqual(urlStore.getFromPersistence(), {
+    count: '5',
+    name: 'birds',
+    level: '1.5',
+    flying: false,
+  });
+  t.end();
 }
