@@ -1,7 +1,7 @@
 {
   "name": "@jimkang/url-store",
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Gets, sets, and syncs state from the URL hash and an internal dictionary. Calls your callback when it changes.",
   "main": "index.js",
   "scripts": {
