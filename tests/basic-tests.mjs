@@ -6,6 +6,7 @@ var { URLStore } = URLStorePkg;
 test('Read from hash', readFromHashTest);
 test('Update hash', updateHashTest);
 test('Copy from search', copyFromSearchTest);
+test('Preserve defaults', preserveDefaultsTest);
 
 function readFromHashTest(t) {
   var urlStore = URLStore({
@@ -133,4 +134,38 @@ function copyFromSearchTest(t) {
   t.deepEqual(urlStore.getFromPersistence(), expectedState);
 
   t.end();
+}
+
+function preserveDefaultsTest(t) {
+  var defaults = {
+    flying: true,
+  };
+
+  var location = {
+    protocol: 'https:',
+    host: 'cat.net',
+    pathname: '/hey',
+    hash: '#',
+  };
+  var urlStore = URLStore({
+    defaults,
+    onUpdate,
+    boolKeys: ['flying'],
+    windowObject: {
+      location,
+      history: {
+        pushState(a, b, url) {
+          location.hash = '#' + url.split('#')[1];
+        },
+      },
+    },
+  });
+
+  urlStore.update({ flying: false });
+
+  function onUpdate(state) {
+    t.deepEqual(state, { flying: false }, 'Passed state is correct.');
+    t.deepEqual(defaults, { flying: true }, 'Defaults are unchanged.');
+    t.end();
+  }
 }

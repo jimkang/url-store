@@ -48,6 +48,7 @@ export function URLStore({
 
   function getFromPersistence() {
     var state = Object.assign(
+      {}, // Make sure to use defaults, not to write to them.
       defaults,
       qs.parse(windowObject.location.hash.slice(1)),
     );
