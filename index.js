@@ -50,7 +50,7 @@ export function URLStore({
     var state = Object.assign(
       {}, // Make sure to use defaults, not to write to them.
       defaults,
-      qs.parse(windowObject.location.hash.slice(1)),
+      qs.parse(decodeURIComponent(windowObject.location.hash.slice(1))),
     );
     return processBoolsAfterDeserialization(state, boolKeys);
   }
