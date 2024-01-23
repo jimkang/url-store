@@ -46,7 +46,11 @@ The `updateEphemeral` method is like `update` except it does not update (or draw
 
 You can pass an array in `boolKeys` in the constructor to have it convert properties with values like 'yes' or 'no' to boolean `true` and `false` when parsing from the hash and converting `true` and `false` in the in-memory state to 'yes and 'no' when writing back to the hash.
 
+You can do the same with `jsonKeys` to have it parse/stringify key values as JSON. (The value will look really ugly in the hash, though.)
+
 There is also a `moveSearchToHash` that'll take things from the search string in the URL (the part after the `?`) and put it in the hash (after the `#`).
+
+You can set the state with nested objects, but it's not advised because the verboseness of [nested object hash serialization](https://www.npmjs.com/package/qs#parsing-objects). (There are alternatives to that, but they're also ugly.)
 
 # Tests
 

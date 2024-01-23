@@ -7,6 +7,8 @@ test('Read from hash', readFromHashTest);
 test('Update hash', updateHashTest);
 test('Copy from search', copyFromSearchTest);
 test('Preserve defaults', preserveDefaultsTest);
+test('Update with json key', updateWithJSONTest);
+test('Read json', readJSONTest);
 
 function readFromHashTest(t) {
   var urlStore = URLStore({
@@ -166,6 +168,106 @@ function preserveDefaultsTest(t) {
   function onUpdate(state) {
     t.deepEqual(state, { flying: false }, 'Passed state is correct.');
     t.deepEqual(defaults, { flying: true }, 'Defaults are unchanged.');
+    t.end();
+  }
+}
+
+function updateWithJSONTest(t) {
+  var location = {
+    protocol: 'https:',
+    host: 'cat.net',
+    pathname: '/hey',
+    hash: '#count=5',
+  };
+
+  var urlStore = URLStore({
+    onUpdate,
+    jsonKeys: ['birdlist'],
+    windowObject: {
+      location,
+      history: {
+        pushState(a, b, url) {
+          location.hash = '#' + url.split('#')[1];
+          t.equal(
+            url,
+            'https://cat.net/hey#birdlist=%5B%7B%22name%22%3A%22Mockingbird%22%2C%22size%22%3A%22small%22%2C%22colors%22%3A%5B%22black%22%2C%22white%22%5D%7D%2C%7B%22name%22%3A%22Bluejay%22%2C%22size%22%3A%22medium%22%2C%22colors%22%3A%5B%22blue%22%5D%2C%22meta%22%3A%7B%22coolness%22%3A%229%22%2C%22attitude%22%3A%2210%22%7D%7D%5D&count=5',
+          );
+        },
+      },
+    },
+  });
+
+  urlStore.update({
+    count: 5,
+    birdlist: [
+      {
+        name: 'Mockingbird',
+        size: 'small',
+        colors: ['black', 'white'],
+      },
+      {
+        name: 'Bluejay',
+        size: 'medium',
+        colors: ['blue'],
+        meta: {
+          coolness: '9',
+          attitude: '10',
+        },
+      },
+    ],
+  });
+
+  function onUpdate(state) {
+    t.deepEqual(state, {
+      count: '5',
+      birdlist: [
+        { colors: ['black', 'white'], name: 'Mockingbird', size: 'small' },
+        {
+          colors: ['blue'],
+          meta: { attitude: '10', coolness: '9' },
+          name: 'Bluejay',
+          size: 'medium',
+        },
+      ],
+    });
+    t.end();
+  }
+}
+
+function readJSONTest(t) {
+  var location = {
+    protocol: 'https:',
+    host: 'cat.net',
+    pathname: '/hey',
+    hash: '#birdlist=%5B%7B%22name%22%3A%22Mockingbird%22%2C%22size%22%3A%22small%22%2C%22colors%22%3A%5B%22black%22%2C%22white%22%5D%7D%2C%7B%22name%22%3A%22Bluejay%22%2C%22size%22%3A%22medium%22%2C%22colors%22%3A%5B%22blue%22%5D%2C%22meta%22%3A%7B%22coolness%22%3A%229%22%2C%22attitude%22%3A%2210%22%7D%7D%5D&count=5',
+  };
+
+  var urlStore = URLStore({
+    onUpdate,
+    jsonKeys: ['birdlist'],
+    windowObject: {
+      location,
+      history: {
+        pushState() {},
+      },
+    },
+  });
+
+  urlStore.update();
+
+  function onUpdate(state) {
+    t.deepEqual(state, {
+      count: '5',
+      birdlist: [
+        { colors: ['black', 'white'], name: 'Mockingbird', size: 'small' },
+        {
+          colors: ['blue'],
+          meta: { attitude: '10', coolness: '9' },
+          name: 'Bluejay',
+          size: 'medium',
+        },
+      ],
+    });
     t.end();
   }
 }

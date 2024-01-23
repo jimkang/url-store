@@ -13,7 +13,6 @@ function readFromNestedHashTest(t) {
     },
     onUpdate,
     boolKeys: ['flying', 'dancing'],
-    jsonKeys: ['birdlist'],
     windowObject: {
       location: {
         protocol: 'https',

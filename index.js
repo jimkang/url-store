@@ -8,6 +8,7 @@ export function URLStore({
   defaults = {},
   windowObject,
   boolKeys = [],
+  jsonKeys = [],
   // TODO: numberKeys
 }) {
   // This is where we keep stuff that's only meant to be in-memory
@@ -52,12 +53,24 @@ export function URLStore({
       defaults,
       qs.parse(windowObject.location.hash.slice(1)),
     );
-    return processBoolsAfterDeserialization(state, boolKeys);
+    return processSpecialsAfterDeserialization(
+      processSpecialsAfterDeserialization(state, boolKeys, deserializeBool),
+      jsonKeys,
+      deserializeJSONString,
+    );
   }
 
   // params: Record<string, unknown>
   function saveToPersistence(params) {
-    var dictCopy = prepareBoolsForSerialization(cloneDeep(params), boolKeys);
+    var dictCopy = prepareSpecialsForSerialization(
+      prepareSpecialsForSerialization(
+        cloneDeep(params),
+        boolKeys,
+        serializeBool,
+      ),
+      jsonKeys,
+      JSON.stringify,
+    );
 
     var updatedURL =
       windowObject.location.protocol +
@@ -80,29 +93,52 @@ export function URLStore({
   }
 }
 
-function prepareBoolsForSerialization(dictCopy, boolKeys) {
-  for (var i = 0; i < boolKeys.length; ++i) {
-    const prop = boolKeys[i];
-    let val = dictCopy[prop];
-    if (val) {
-      val = 'yes';
-    } else {
-      val = 'no';
-    }
-    dictCopy[prop] = val;
+function prepareSpecialsForSerialization(
+  dictCopy,
+  specialKeys,
+  serializeValue,
+) {
+  for (var i = 0; i < specialKeys.length; ++i) {
+    const prop = specialKeys[i];
+    dictCopy[prop] = serializeValue(dictCopy[prop]);
   }
   return dictCopy;
 }
 
-function processBoolsAfterDeserialization(params, boolKeys) {
-  for (var i = 0; i < boolKeys.length; ++i) {
-    const prop = boolKeys[i];
-    let val = params[prop];
-    if (typeof val === 'string') {
-      params[prop] = val === 'yes';
-    }
+function processSpecialsAfterDeserialization(
+  params,
+  specialKeys,
+  deserializeValue,
+) {
+  for (var i = 0; i < specialKeys.length; ++i) {
+    const prop = specialKeys[i];
+    params[prop] = deserializeValue(params[prop]);
   }
   return params;
+}
+
+function serializeBool(val) {
+  if (val) {
+    return 'yes';
+  }
+  return 'no';
+}
+
+function deserializeBool(val) {
+  if (typeof val === 'boolean') {
+    return val;
+  }
+  if (typeof val === 'string') {
+    return val === 'yes';
+  }
+  return false;
+}
+
+function deserializeJSONString(s) {
+  if (typeof s === 'string') {
+    return JSON.parse(s);
+  }
+  return s;
 }
 
 function basicSort(a, b) {
