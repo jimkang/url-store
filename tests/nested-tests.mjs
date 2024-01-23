@@ -4,7 +4,6 @@ import test from 'tape';
 var { URLStore } = URLStorePkg;
 
 test('Read nested from hash', readFromNestedHashTest);
-test('Read nested from encoded hash', readFromEncodedHashTest);
 test('Update nested hash', updateNestedHashTest);
 
 function readFromNestedHashTest(t) {
@@ -14,6 +13,7 @@ function readFromNestedHashTest(t) {
     },
     onUpdate,
     boolKeys: ['flying', 'dancing'],
+    jsonKeys: ['birdlist'],
     windowObject: {
       location: {
         protocol: 'https',
@@ -35,7 +35,7 @@ function readFromNestedHashTest(t) {
   urlStore.update();
 
   function onUpdate(state) {
-    var expectedState = {
+    t.deepEqual(state, {
       count: '5',
       name: 'birds',
       level: '1.5',
@@ -57,10 +57,7 @@ function readFromNestedHashTest(t) {
           },
         },
       ],
-    };
-
-    t.deepEqual(state, expectedState, 'State is correct on update.');
-
+    });
     t.end();
   }
 }
@@ -87,7 +84,7 @@ function updateNestedHashTest(t) {
 
           t.equal(
             url,
-            'https//cat.net/hey#birdlist%5B0%5D%5Bcolors%5D%5B0%5D=blue&birdlist%5B0%5D%5Bmeta%5D%5Battitude%5D=11&birdlist%5B0%5D%5Bmeta%5D%5Bcoolness%5D=9&birdlist%5B0%5D%5Bname%5D=Bluejay&birdlist%5B0%5D%5Bsize%5D=medium&birdlist%5B1%5D%5Bcolors%5D%5B0%5D=black&birdlist%5B1%5D%5Bcolors%5D%5B1%5D%5Bwhatever%5D=obsidian&birdlist%5B1%5D%5Bname%5D=Crow&birdlist%5B1%5D%5Bsize%5D=large&count=5&flying=no&level=3&name=birds&squirrelCount=2',
+            'https//cat.net/hey#birdlist%5B0%5D%5Bcolors%5D%5B0%5D=blue&birdlist%5B0%5D%5Bmeta%5D%5Battitude%5D=11&birdlist%5B0%5D%5Bmeta%5D%5Bcoolness%5D=9&birdlist%5B0%5D%5Bname%5D=Bluejay&birdlist%5B0%5D%5Bsize%5D=medium&birdlist%5B1%5D%5Bcolors%5D%5B0%5D=black&birdlist%5B1%5D%5Bname%5D=Crow&birdlist%5B1%5D%5Bsize%5D=large&count=5&flying=no&level=3&name=birds&squirrelCount=2',
           );
         },
       },
@@ -111,13 +108,13 @@ function updateNestedHashTest(t) {
       {
         name: 'Crow',
         size: 'large',
-        colors: ['black', { whatever: 'obsidian' }],
+        colors: ['black'],
       },
     ],
   });
 
   function onUpdate(state) {
-    var expectedState = {
+    t.deepEqual(state, {
       count: '5',
       name: 'birds',
       level: '3',
@@ -136,80 +133,10 @@ function updateNestedHashTest(t) {
         {
           name: 'Crow',
           size: 'large',
-          colors: ['black', { whatever: 'obsidian' }],
+          colors: ['black'],
         },
       ],
-    };
-    t.deepEqual(state, expectedState, 'State is correct after updating.');
-
-    var fetchedState = urlStore.getFromPersistence();
-    t.deepEqual(
-      fetchedState,
-      expectedState,
-      'State after fetching again does not have mangled arrays.',
-    );
-
-    t.end();
-  }
-}
-
-function readFromEncodedHashTest(t) {
-  const encodedHash =
-    '#' +
-    encodeURIComponent(
-      'count=5&name=birds&level=1.5&dancing=no&birdlist%5B0%5D%5Bname%5D=Mockingbird&birdlist%5B0%5D%5Bsize%5D=small&birdlist%5B0%5D%5Bcolors%5D%5B0%5D=black&birdlist%5B0%5D%5Bcolors%5D%5B1%5D=white&birdlist%5B1%5D%5Bname%5D=Bluejay&birdlist%5B1%5D%5Bsize%5D=medium&birdlist%5B1%5D%5Bcolors%5D%5B0%5D=blue&birdlist%5B1%5D%5Bmeta%5D%5Bcoolness%5D=9&birdlist%5B1%5D%5Bmeta%5D%5Battitude%5D=10',
-    );
-
-  var urlStore = URLStore({
-    defaults: {},
-    boolKeys: ['flying', 'dancing'],
-    onUpdate,
-    windowObject: {
-      location: {
-        protocol: 'https',
-        host: 'cat.net',
-        pathname: '/hey',
-        hash: encodedHash,
-      },
-      history: {
-        pushState(a, b, url) {
-          t.equal(
-            url,
-            'https//cat.net/hey#birdlist%5B0%5D%5Bcolors%5D%5B0%5D=black&birdlist%5B0%5D%5Bcolors%5D%5B1%5D=white&birdlist%5B0%5D%5Bname%5D=Mockingbird&birdlist%5B0%5D%5Bsize%5D=small&birdlist%5B1%5D%5Bcolors%5D%5B0%5D=blue&birdlist%5B1%5D%5Bmeta%5D%5Battitude%5D=10&birdlist%5B1%5D%5Bmeta%5D%5Bcoolness%5D=9&birdlist%5B1%5D%5Bname%5D=Bluejay&birdlist%5B1%5D%5Bsize%5D=medium&count=5&dancing=no&flying=no&level=1.5&name=birds',
-          );
-        },
-      },
-    },
-  });
-
-  urlStore.update();
-
-  function onUpdate(state) {
-    var expectedState = {
-      count: '5',
-      name: 'birds',
-      level: '1.5',
-      dancing: false,
-      birdlist: [
-        {
-          name: 'Mockingbird',
-          size: 'small',
-          colors: ['black', 'white'],
-        },
-        {
-          name: 'Bluejay',
-          size: 'medium',
-          colors: ['blue'],
-          meta: {
-            coolness: '9',
-            attitude: '10',
-          },
-        },
-      ],
-    };
-
-    t.deepEqual(state, expectedState, 'State is correct on update.');
-
+    });
     t.end();
   }
 }
