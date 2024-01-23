@@ -190,7 +190,7 @@ function updateWithJSONTest(t) {
           location.hash = '#' + url.split('#')[1];
           t.equal(
             url,
-            'https://cat.net/hey#birdlist=%5B%7B%22name%22%3A%22Mockingbird%22%2C%22size%22%3A%22small%22%2C%22colors%22%3A%5B%22black%22%2C%22white%22%5D%7D%2C%7B%22name%22%3A%22Bluejay%22%2C%22size%22%3A%22medium%22%2C%22colors%22%3A%5B%22blue%22%5D%2C%22meta%22%3A%7B%22coolness%22%3A%229%22%2C%22attitude%22%3A%2210%22%7D%7D%5D&count=5',
+            'https://cat.net/hey#birdlist=[{"name":"Mockingbird","size":"small","colors":["black","white"]},{"name":"Bluejay","size":"medium","colors":["blue"],"meta":{"coolness":"9","attitude":"10"}}]&count=5',
           );
         },
       },

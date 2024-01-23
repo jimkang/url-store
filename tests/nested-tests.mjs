@@ -15,16 +15,16 @@ function readFromNestedHashTest(t) {
     boolKeys: ['flying', 'dancing'],
     windowObject: {
       location: {
-        protocol: 'https',
+        protocol: 'https:',
         host: 'cat.net',
         pathname: '/hey',
-        hash: '#count=5&name=birds&level=1.5&dancing=no&birdlist%5B0%5D%5Bname%5D=Mockingbird&birdlist%5B0%5D%5Bsize%5D=small&birdlist%5B0%5D%5Bcolors%5D%5B0%5D=black&birdlist%5B0%5D%5Bcolors%5D%5B1%5D=white&birdlist%5B1%5D%5Bname%5D=Bluejay&birdlist%5B1%5D%5Bsize%5D=medium&birdlist%5B1%5D%5Bcolors%5D%5B0%5D=blue&birdlist%5B1%5D%5Bmeta%5D%5Bcoolness%5D=9&birdlist%5B1%5D%5Bmeta%5D%5Battitude%5D=10',
+        hash: '#birdlist[0][colors][0]=black&birdlist[0][colors][1]=white&birdlist[0][name]=Mockingbird&birdlist[0][size]=small&birdlist[1][colors][0]=blue&birdlist[1][meta][attitude]=10&birdlist[1][meta][coolness]=9&birdlist[1][name]=Bluejay&birdlist[1][size]=medium&count=5&dancing=no&flying=yes&level=1.5&name=birds',
       },
       history: {
         pushState(a, b, url) {
           t.equal(
             url,
-            'https//cat.net/hey#birdlist%5B0%5D%5Bcolors%5D%5B0%5D=black&birdlist%5B0%5D%5Bcolors%5D%5B1%5D=white&birdlist%5B0%5D%5Bname%5D=Mockingbird&birdlist%5B0%5D%5Bsize%5D=small&birdlist%5B1%5D%5Bcolors%5D%5B0%5D=blue&birdlist%5B1%5D%5Bmeta%5D%5Battitude%5D=10&birdlist%5B1%5D%5Bmeta%5D%5Bcoolness%5D=9&birdlist%5B1%5D%5Bname%5D=Bluejay&birdlist%5B1%5D%5Bsize%5D=medium&count=5&dancing=no&flying=yes&level=1.5&name=birds',
+            'https://cat.net/hey#birdlist[0][colors][0]=black&birdlist[0][colors][1]=white&birdlist[0][name]=Mockingbird&birdlist[0][size]=small&birdlist[1][colors][0]=blue&birdlist[1][meta][attitude]=10&birdlist[1][meta][coolness]=9&birdlist[1][name]=Bluejay&birdlist[1][size]=medium&count=5&dancing=no&flying=yes&level=1.5&name=birds',
           );
         },
       },
@@ -63,7 +63,7 @@ function readFromNestedHashTest(t) {
 
 function updateNestedHashTest(t) {
   var location = {
-    protocol: 'https',
+    protocol: 'https:',
     host: 'cat.net',
     pathname: '/hey',
     hash: '#count=5&name=birds&level=1.5&birdlist%5B0%5D%5Bname%5D=Mockingbird&birdlist%5B0%5D%5Bsize%5D=small&birdlist%5B0%5D%5Bcolors%5D%5B0%5D=black&birdlist%5B0%5D%5Bcolors%5D%5B1%5D=white&birdlist%5B1%5D%5Bname%5D=Bluejay&birdlist%5B1%5D%5Bsize%5D=medium&birdlist%5B1%5D%5Bcolors%5D%5B0%5D=blue&birdlist%5B1%5D%5Bmeta%5D%5Bcoolness%5D=9&birdlist%5B1%5D%5Bmeta%5D%5Battitude%5D=10',
@@ -83,7 +83,7 @@ function updateNestedHashTest(t) {
 
           t.equal(
             url,
-            'https//cat.net/hey#birdlist%5B0%5D%5Bcolors%5D%5B0%5D=blue&birdlist%5B0%5D%5Bmeta%5D%5Battitude%5D=11&birdlist%5B0%5D%5Bmeta%5D%5Bcoolness%5D=9&birdlist%5B0%5D%5Bname%5D=Bluejay&birdlist%5B0%5D%5Bsize%5D=medium&birdlist%5B1%5D%5Bcolors%5D%5B0%5D=black&birdlist%5B1%5D%5Bname%5D=Crow&birdlist%5B1%5D%5Bsize%5D=large&count=5&flying=no&level=3&name=birds&squirrelCount=2',
+            'https://cat.net/hey#birdlist[0][colors][0]=blue&birdlist[0][meta][attitude]=11&birdlist[0][meta][coolness]=9&birdlist[0][name]=Bluejay&birdlist[0][size]=medium&birdlist[1][colors][0]=black&birdlist[1][name]=Crow&birdlist[1][size]=large&count=5&flying=no&level=3&name=birds&squirrelCount=2',
           );
         },
       },

@@ -78,7 +78,7 @@ export function URLStore({
       windowObject.location.host +
       windowObject.location.pathname +
       '#' +
-      qs.stringify(dictCopy, { sort: basicSort });
+      decodeURIComponent(qs.stringify(dictCopy, { sort: basicSort }));
 
     // Sync URL without triggering onhashchange.
     windowObject.history.pushState(null, '', updatedURL);
