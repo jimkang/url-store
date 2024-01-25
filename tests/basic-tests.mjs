@@ -9,7 +9,8 @@ test('Copy from search', copyFromSearchTest);
 test('Preserve defaults', preserveDefaultsTest);
 test('Update with json key', updateWithJSONTest);
 test('Read json', readJSONTest);
-test('Handle empty json key', updateEmptyJSONTest);
+test('Update with empty json key', updateEmptyJSONTest);
+test('Read with empty json key', readEmptyJSONTest);
 
 function readFromHashTest(t) {
   var urlStore = URLStore({
@@ -295,5 +296,29 @@ function updateEmptyJSONTest(t) {
   });
 
   t.doesNotThrow(() => urlStore.update({}));
+  t.end();
+}
+
+function readEmptyJSONTest(t) {
+  var location = {
+    protocol: 'https:',
+    host: 'cat.net',
+    pathname: '/hey',
+    hash: '#birdlist=',
+  };
+
+  var urlStore = URLStore({
+    onUpdate: () => null,
+    jsonKeys: ['birdlist'],
+    windowObject: {
+      location,
+      history: {
+        pushState() {},
+      },
+    },
+  });
+
+  // Normally, we'd have an onUpdate that would do the read. Here, we're just making sure it doesn't crash.
+  t.doesNotThrow(urlStore.update);
   t.end();
 }

@@ -143,7 +143,7 @@ function deserializeBool(val) {
 }
 
 function deserializeJSONString(s) {
-  if (typeof s === 'string') {
+  if (s && typeof s === 'string') {
     return JSON.parse(s);
   }
   return s;
