@@ -150,6 +150,9 @@ function deserializeJSONString(s) {
 }
 
 function serializeJSONString(value) {
+  if (value === undefined) {
+    return '';
+  }
   // Convert delimiters that cause url problems (&, =, +), but don't encode everything with
   // encodeURIComponent.
   return JSON.stringify(value)

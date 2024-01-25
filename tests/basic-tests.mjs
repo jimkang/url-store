@@ -9,6 +9,7 @@ test('Copy from search', copyFromSearchTest);
 test('Preserve defaults', preserveDefaultsTest);
 test('Update with json key', updateWithJSONTest);
 test('Read json', readJSONTest);
+test('Handle empty json key', updateEmptyJSONTest);
 
 function readFromHashTest(t) {
   var urlStore = URLStore({
@@ -272,4 +273,27 @@ function readJSONTest(t) {
     });
     t.end();
   }
+}
+
+function updateEmptyJSONTest(t) {
+  var location = {
+    protocol: 'https:',
+    host: 'cat.net',
+    pathname: '/hey',
+    hash: '#',
+  };
+
+  var urlStore = URLStore({
+    onUpdate: () => null,
+    jsonKeys: ['birdlist'],
+    windowObject: {
+      location,
+      history: {
+        pushState() {},
+      },
+    },
+  });
+
+  t.doesNotThrow(() => urlStore.update({}));
+  t.end();
 }
