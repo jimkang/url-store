@@ -190,7 +190,7 @@ function updateWithJSONTest(t) {
           location.hash = '#' + url.split('#')[1];
           t.equal(
             url,
-            'https://cat.net/hey#birdlist=[{"name":"Mockingbird","size":"small","colors":["black","white"]},{"name":"Bluejay","size":"medium","colors":["blue"],"meta":{"coolness":"9","attitude":"10"}}]&count=5',
+            'https://cat.net/hey#birdlist=[{"name":"Mockingbird","size":"small","colors":["black","white"]},{"name":"Bluejay","size":"medium","colors":["blue"],"meta":{"coolness":"9","attitude":"10"},"homepage":"https://duckduckgo.com/?t%3Dffab%26q%3Dblue%2Bjay%26ia%3Dweb"}]&count=5',
           );
         },
       },
@@ -213,6 +213,7 @@ function updateWithJSONTest(t) {
           coolness: '9',
           attitude: '10',
         },
+        homepage: 'https://duckduckgo.com/?t=ffab&q=blue+jay&ia=web',
       },
     ],
   });
@@ -227,6 +228,7 @@ function updateWithJSONTest(t) {
           meta: { attitude: '10', coolness: '9' },
           name: 'Bluejay',
           size: 'medium',
+          homepage: 'https://duckduckgo.com/?t=ffab&q=blue+jay&ia=web',
         },
       ],
     });

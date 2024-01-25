@@ -3,6 +3,10 @@
 import qs from 'qs';
 import cloneDeep from 'lodash.clonedeep';
 
+var ampRegex = /&/g;
+var eqRegex = /=/g;
+var plusRegex = /\+/g;
+
 export function URLStore({
   onUpdate,
   defaults = {},
@@ -51,7 +55,7 @@ export function URLStore({
     var state = Object.assign(
       {}, // Make sure to use defaults, not to write to them.
       defaults,
-      qs.parse(windowObject.location.hash.slice(1)),
+      parseHashString(windowObject.location.hash),
     );
     return processSpecialsAfterDeserialization(
       processSpecialsAfterDeserialization(state, boolKeys, deserializeBool),
@@ -69,7 +73,7 @@ export function URLStore({
         serializeBool,
       ),
       jsonKeys,
-      JSON.stringify,
+      serializeJSONString,
     );
 
     var updatedURL =
@@ -78,7 +82,7 @@ export function URLStore({
       windowObject.location.host +
       windowObject.location.pathname +
       '#' +
-      decodeURIComponent(qs.stringify(dictCopy, { sort: basicSort }));
+      qs.stringify(dictCopy, { sort: basicSort, encode: false });
 
     // Sync URL without triggering onhashchange.
     windowObject.history.pushState(null, '', updatedURL);
@@ -88,8 +92,12 @@ export function URLStore({
     if (!windowObject.location.search || windowObject.location.search === '?') {
       return;
     }
-    saveToPersistence(qs.parse(windowObject.location.search.slice(1)));
+    saveToPersistence(parseHashString(windowObject.location.search));
     windowObject.location.search = '';
+  }
+
+  function parseHashString(s) {
+    return qs.parse(s.slice(1), { decode: false });
   }
 }
 
@@ -139,6 +147,15 @@ function deserializeJSONString(s) {
     return JSON.parse(s);
   }
   return s;
+}
+
+function serializeJSONString(value) {
+  // Convert delimiters that cause url problems (&, =, +), but don't encode everything with
+  // encodeURIComponent.
+  return JSON.stringify(value)
+    .replace(ampRegex, '%26')
+    .replace(eqRegex, '%3D')
+    .replace(plusRegex, '%2B');
 }
 
 function basicSort(a, b) {
