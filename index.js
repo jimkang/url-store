@@ -30,6 +30,8 @@ export function URLStore({
     // but use them if needed.
     getFromPersistence,
     saveToPersistence,
+
+    clear,
   };
 
   function onHashChange() {
@@ -98,6 +100,10 @@ export function URLStore({
 
   function parseHashString(s) {
     return qs.parse(s.slice(1), { decode: false });
+  }
+
+  function clear() {
+    saveToPersistence({});
   }
 }
 

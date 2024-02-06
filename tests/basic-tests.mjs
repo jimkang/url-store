@@ -11,6 +11,7 @@ test('Update with json key', updateWithJSONTest);
 test('Read json', readJSONTest);
 test('Update with empty json key', updateEmptyJSONTest);
 test('Read with empty json key', readEmptyJSONTest);
+test('Clear', clearTest);
 
 function readFromHashTest(t) {
   var urlStore = URLStore({
@@ -321,4 +322,27 @@ function readEmptyJSONTest(t) {
   // Normally, we'd have an onUpdate that would do the read. Here, we're just making sure it doesn't crash.
   t.doesNotThrow(urlStore.update);
   t.end();
+}
+
+function clearTest(t) {
+  var urlStore = URLStore({
+    boolKeys: ['flying', 'dancing'],
+    windowObject: {
+      location: {
+        protocol: 'https:',
+        host: 'cat.net',
+        pathname: '/hey',
+        hash: '#count=5&name=birds&level=1.5&dancing=no',
+      },
+      history: {
+        pushState(a, b, url) {
+          // Bool default values should be there, even after a clear.
+          t.equal(url, 'https://cat.net/hey#dancing=no&flying=no');
+          t.end();
+        },
+      },
+    },
+  });
+
+  urlStore.clear();
 }
