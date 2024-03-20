@@ -131,14 +131,14 @@ function processSpecialsAfterDeserialization(
   return params;
 }
 
-function serializeBool(val) {
+export function serializeBool(val) {
   if (val) {
     return 'yes';
   }
   return 'no';
 }
 
-function deserializeBool(val) {
+export function deserializeBool(val) {
   if (typeof val === 'boolean') {
     return val;
   }
@@ -148,14 +148,14 @@ function deserializeBool(val) {
   return false;
 }
 
-function deserializeJSONString(s) {
+export function deserializeJSONString(s) {
   if (s && typeof s === 'string') {
     return JSON.parse(s);
   }
   return s;
 }
 
-function serializeJSONString(value) {
+export function serializeJSONString(value) {
   if (value === undefined) {
     return '';
   }
