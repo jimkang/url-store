@@ -20,6 +20,7 @@ function readFromHashTest(t) {
     },
     onUpdate,
     boolKeys: ['flying', 'dancing'],
+    numberKeys: ['count', 'level'],
     windowObject: {
       location: {
         protocol: 'https:',
@@ -42,9 +43,9 @@ function readFromHashTest(t) {
 
   function onUpdate(state) {
     t.deepEqual(state, {
-      count: '5',
+      count: 5,
       name: 'birds',
-      level: '1.5',
+      level: 1.5,
       dancing: false,
       flying: true,
     });
@@ -66,6 +67,7 @@ function updateHashTest(t) {
     },
     onUpdate,
     boolKeys: ['flying'],
+    numberKeys: ['count', 'level'],
     windowObject: {
       location,
       history: {
@@ -85,11 +87,11 @@ function updateHashTest(t) {
 
   function onUpdate(state) {
     t.deepEqual(state, {
-      count: '5',
+      count: 5,
       name: 'birds',
-      level: '3',
+      level: 3,
       flying: false,
-      squirrelCount: '2',
+      squirrelCount: 2,
     });
     t.end();
   }
@@ -108,6 +110,7 @@ function copyFromSearchTest(t) {
       flying: true,
     },
     boolKeys: ['flying'],
+    numberKeys: ['count', 'level'],
     windowObject: {
       location,
       history: {
@@ -124,9 +127,9 @@ function copyFromSearchTest(t) {
   });
 
   var expectedState = {
-    count: '5',
+    count: 5,
     name: 'birds',
-    level: '1.5',
+    level: 1.5,
     flying: false,
   };
 
@@ -223,7 +226,7 @@ function updateWithJSONTest(t) {
 
   function onUpdate(state) {
     t.deepEqual(state, {
-      count: '5',
+      count: 5,
       birdlist: [
         { colors: ['black', 'white'], name: 'Mockingbird', size: 'small' },
         {

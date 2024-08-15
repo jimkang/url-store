@@ -13,7 +13,9 @@ export function URLStore({
   windowObject,
   boolKeys = [],
   jsonKeys = [],
-  // TODO: numberKeys
+  numberKeys = [],
+  encoder,
+  decoder,
 }) {
   // This is where we keep stuff that's only meant to be in-memory
   // and shouldn't be persisted.
@@ -49,7 +51,8 @@ export function URLStore({
     if (onUpdate) {
       // If getFromPersistence() is different from state, we want to flush that
       // out, so we're calling this here for now.
-      onUpdate(getFromPersistence());
+      // onUpdate(getFromPersistence());
+      onUpdate(state);
     }
   }
 
@@ -60,7 +63,11 @@ export function URLStore({
       parseHashString(windowObject.location.hash),
     );
     return processSpecialsAfterDeserialization(
-      processSpecialsAfterDeserialization(state, boolKeys, deserializeBool),
+      processSpecialsAfterDeserialization(
+        processSpecialsAfterDeserialization(state, boolKeys, deserializeBool),
+        numberKeys,
+        deserializeNumber,
+      ),
       jsonKeys,
       deserializeJSONString,
     );
@@ -148,6 +155,15 @@ export function deserializeBool(val) {
   return false;
 }
 
+export function deserializeNumber(val) {
+  if (typeof val === 'number') {
+    return val;
+  }
+  if (typeof val === 'string') {
+    return +val;
+  }
+  return false;
+}
 export function deserializeJSONString(s) {
   if (s && typeof s === 'string') {
     return JSON.parse(s);
