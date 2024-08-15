@@ -20,7 +20,8 @@ function updateWithEncoderTest(t) {
     onUpdate,
     jsonKeys: ['birdlist'],
     numberKeys: ['count'],
-    encoder(input, de, charset, type) {
+    encoder(input, de, charset, type, format, key) {
+      console.log('corresponding key', key);
       const s = '' + input;
       if (type === 'key') {
         return s;
@@ -101,7 +102,8 @@ function readWithDecoderTest(t) {
         pushState() {},
       },
     },
-    decoder(input, de, cs, type) {
+    decoder(input, de, cs, type, key) {
+      console.log('corresponding key', key);
       const s = '' + input;
       if (type === 'key') {
         return s;

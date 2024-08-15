@@ -25,6 +25,6 @@
   },
   "dependencies": {
     "lodash.clonedeep": "^4.5.0",
-    "qs": "^6.5.0"
+    "qs": "github:jimkang/qs#pass-keys-to-encoder"
   }
 }
