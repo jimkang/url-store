@@ -49,9 +49,6 @@ export function URLStore({
     saveToPersistence(state);
 
     if (onUpdate) {
-      // If getFromPersistence() is different from state, we want to flush that
-      // out, so we're calling this here for now.
-      // onUpdate(getFromPersistence());
       onUpdate(state);
     }
   }
@@ -91,7 +88,7 @@ export function URLStore({
       windowObject.location.host +
       windowObject.location.pathname +
       '#' +
-      qs.stringify(dictCopy, { sort: basicSort, encode: false });
+      qs.stringify(dictCopy, { sort: basicSort, encode: !!encoder, encoder });
 
     // Sync URL without triggering onhashchange.
     windowObject.history.pushState(null, '', updatedURL);
@@ -106,7 +103,7 @@ export function URLStore({
   }
 
   function parseHashString(s) {
-    return qs.parse(s.slice(1), { decode: false });
+    return qs.parse(s.slice(1), { decode: !!decoder, decoder });
   }
 
   function clear() {

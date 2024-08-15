@@ -52,9 +52,27 @@ There is also a `moveSearchToHash` that'll take things from the search string in
 
 You can set the state with nested objects, but it's not advised because the verboseness of [nested object hash serialization](https://www.npmjs.com/package/qs#parsing-objects). (There are alternatives to that, but they're also ugly.)
 
+You can pass `encoder` and `decoder` functions, which will be passed through to [qs](https://www.npmjs.com/package/qs#Stringifying).
+
 # Tests
 
 Run tests with `make test`.
+
+# Behavior
+
+The order things are run during updates is:
+
+- Get from persistence
+    - Parse hash string format
+        - Any user-provided decoder
+    - Process "specials"
+        - Deserialize value
+            - If the value is JSON, JSON.parse
+- Update values
+- Save to persistence
+    - qs.stringify
+        - Any user-provided encoder
+- Send the state to onUpdate
 
 # License
 

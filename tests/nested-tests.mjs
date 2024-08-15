@@ -75,6 +75,7 @@ function updateNestedHashTest(t) {
     },
     onUpdate,
     boolKeys: ['flying'],
+    numberKeys: ['count', 'level', 'squirrelCount'],
     windowObject: {
       location,
       history: {
@@ -114,19 +115,19 @@ function updateNestedHashTest(t) {
 
   function onUpdate(state) {
     t.deepEqual(state, {
-      count: '5',
+      count: 5,
       name: 'birds',
-      level: '3',
+      level: 3,
       flying: false,
-      squirrelCount: '2',
+      squirrelCount: 2,
       birdlist: [
         {
           name: 'Bluejay',
           size: 'medium',
           colors: ['blue'],
           meta: {
-            coolness: '9',
-            attitude: '11',
+            coolness: 9,
+            attitude: 11,
           },
         },
         {
