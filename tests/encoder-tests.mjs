@@ -3,8 +3,6 @@ import test from 'tape';
 
 var { URLStore } = URLStorePkg;
 
-var alphaRegex = /[a-zA-Z]/;
-
 test('Update with encoder', updateWithEncoderTest);
 test('Read with decoder', readWithDecoderTest);
 
@@ -29,11 +27,7 @@ function updateWithEncoderTest(t) {
       if (type === 'value') {
         return s
           .split('')
-          .map((cs) =>
-            alphaRegex.test(cs)
-              ? String.fromCodePoint(cs.codePointAt(0) + 1)
-              : cs,
-          )
+          .map((cs) => String.fromCodePoint(cs.codePointAt(0) - 1))
           .join('');
       }
     },
@@ -44,7 +38,7 @@ function updateWithEncoderTest(t) {
           location.hash = '#' + url.split('#')[1];
           t.equal(
             url,
-            'https://cat.net/hey#birdlist=[{"obnf":"Npdljohcjse","dpmpst":["cmbdl","xijuf"]},{"obnf":"Cmvfkbz","dpmpst":["cmvf"],"nfub":{"dppmoftt":"9","buujuvef":"10"}}]&count=5',
+            'https://cat.net/hey#birdlist=Zz!m`ld!9!Lnbjhmfahqc!+!bnknqr!9Z!ak`bj!+!vghsd!\\+!tqk!9!gssor9..lnbjhmfahqc-bnl>gdx$2Cxnt$15ahqc$2Cfnnc!|+z!m`ld!9!Aktdi`x!+!bnknqr!9Z!aktd!\\+!lds`!9z!bnnkmdrr!9!8!+!`sshstcd!9!0/!||\\&count=4',
           );
         },
       },
@@ -57,6 +51,7 @@ function updateWithEncoderTest(t) {
       {
         name: 'Mockingbird',
         colors: ['black', 'white'],
+        url: 'https://mockingbird.com?hey=you&bird=good',
       },
       {
         name: 'Bluejay',
@@ -73,7 +68,11 @@ function updateWithEncoderTest(t) {
     t.deepEqual(state, {
       count: 5,
       birdlist: [
-        { colors: ['black', 'white'], name: 'Mockingbird' },
+        {
+          colors: ['black', 'white'],
+          name: 'Mockingbird',
+          url: 'https://mockingbird.com?hey=you&bird=good',
+        },
         {
           colors: ['blue'],
           meta: { attitude: '10', coolness: '9' },
@@ -90,7 +89,7 @@ function readWithDecoderTest(t) {
     protocol: 'https:',
     host: 'cat.net',
     pathname: '/hey',
-    hash: '#birdlist=[{"obnf":"Npdljohcjse","dpmpst":["cmbdl","xijuf"]},{"obnf":"Cmvfkbz","dpmpst":["cmvf"],"nfub":{"dppmoftt":"9","buujuvef":"10"}}]&count=5',
+    hash: '#birdlist=Zz!m`ld!9!Lnbjhmfahqc!+!bnknqr!9Z!ak`bj!+!vghsd!\\+!tqk!9!gssor9..lnbjhmfahqc-bnl>gdx$2Cxnt$15ahqc$2Cfnnc!|+z!m`ld!9!Aktdi`x!+!bnknqr!9Z!aktd!\\+!lds`!9z!bnnkmdrr!9!8!+!`sshstcd!9!0/!||\\&count=4',
   };
 
   var urlStore = URLStore({
@@ -109,14 +108,12 @@ function readWithDecoderTest(t) {
         return s;
       }
       if (type === 'value') {
-        return s
+        const decoded = s
           .split('')
-          .map((cs) =>
-            alphaRegex.test(cs)
-              ? String.fromCodePoint(cs.codePointAt(0) - 1)
-              : cs,
-          )
+          .map((cs) => String.fromCodePoint(cs.codePointAt(0) + 1))
           .join('');
+        console.log('Decoded', input, 'into', decoded);
+        return decoded;
       }
     },
   });
@@ -127,7 +124,11 @@ function readWithDecoderTest(t) {
     t.deepEqual(state, {
       count: '5',
       birdlist: [
-        { colors: ['black', 'white'], name: 'Mockingbird' },
+        {
+          colors: ['black', 'white'],
+          name: 'Mockingbird',
+          url: 'https://mockingbird.com?hey=you&bird=good',
+        },
         {
           colors: ['blue'],
           meta: { attitude: '10', coolness: '9' },

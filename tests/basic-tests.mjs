@@ -8,6 +8,10 @@ test('Update hash', updateHashTest);
 test('Copy from search', copyFromSearchTest);
 test('Preserve defaults', preserveDefaultsTest);
 test('Update with json key', updateWithJSONTest);
+test(
+  'Update URL with json that contains encoded chars',
+  updateURLWithEncodedJSONTest,
+);
 test('Read json', readJSONTest);
 test('Update with empty json key', updateEmptyJSONTest);
 test('Read with empty json key', readEmptyJSONTest);
@@ -234,6 +238,47 @@ function updateWithJSONTest(t) {
           meta: { attitude: '10', coolness: '9' },
           name: 'Bluejay',
           size: 'medium',
+          homepage: 'https://duckduckgo.com/?t=ffab&q=blue+jay&ia=web',
+        },
+      ],
+    });
+    t.end();
+  }
+}
+
+function updateURLWithEncodedJSONTest(t) {
+  var location = {
+    protocol: 'https:',
+    host: 'cat.net',
+    pathname: '/hey',
+    hash: '#birdlist=[{"name":"Mockingbird","size":"small","colors":["black","white"]},{"name":"Bluejay","size":"medium","colors":["blue"],"meta":{"coolness":"9","attitude":"10"},"homepage":"https://duckduckgo.com/?t%3Dffab%26q%3Dblue%2Bjay%26ia%3Dweb"}]&count=5',
+  };
+
+  var urlStore = URLStore({
+    onUpdate,
+    jsonKeys: ['birdlist'],
+    numberKeys: ['count'],
+    windowObject: {
+      location,
+      history: {
+        pushState() {},
+      },
+    },
+  });
+
+  urlStore.onHashChange();
+
+  function onUpdate(state) {
+    t.deepEqual(state, {
+      count: 5,
+      birdlist: [
+        { colors: ['black', 'white'], name: 'Mockingbird', size: 'small' },
+        {
+          colors: ['blue'],
+          meta: { attitude: '10', coolness: '9' },
+          name: 'Bluejay',
+          size: 'medium',
+          // We expect the url encoded characters to be decoded here.
           homepage: 'https://duckduckgo.com/?t=ffab&q=blue+jay&ia=web',
         },
       ],

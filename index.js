@@ -6,6 +6,9 @@ import cloneDeep from 'lodash.clonedeep';
 var ampRegex = /&/g;
 var eqRegex = /=/g;
 var plusRegex = /\+/g;
+var escapedAmpRegex = /%26/g;
+var escapedEqRegex = /%3D/g;
+var escapedPlusRegex = /%2B/g;
 
 export function URLStore({
   onUpdate,
@@ -13,10 +16,26 @@ export function URLStore({
   windowObject,
   boolKeys = [],
   jsonKeys = [],
+  // These correspond to JSON values which should not be escaped after stringifying
+  // or unescaped before parsing.
+  rawJSONKeys = [],
   numberKeys = [],
   encoder,
   decoder,
 }) {
+  var deserializatonParams = [
+    { targetKeys: boolKeys, op: deserializeBool },
+    { targetKeys: numberKeys, op: deserializeNumber },
+    { targetKeys: jsonKeys, op: deserializeJSONString },
+    { targetKeys: rawJSONKeys, op: deserializeJSONStringRaw },
+  ];
+  var serializatonParams = [
+    { targetKeys: boolKeys, op: serializeBool },
+    { targetKeys: numberKeys, op: serializeNumber },
+    { targetKeys: jsonKeys, op: serializeJSONString },
+    { targetKeys: rawJSONKeys, op: serializeJSONStringRaw },
+  ];
+
   // This is where we keep stuff that's only meant to be in-memory
   // and shouldn't be persisted.
   // var inMemoryOnlyDict = {};
@@ -32,6 +51,7 @@ export function URLStore({
     // but use them if needed.
     getFromPersistence,
     saveToPersistence,
+    onHashChange,
 
     clear,
   };
@@ -59,27 +79,19 @@ export function URLStore({
       defaults,
       parseHashString(windowObject.location.hash),
     );
-    return processSpecialsAfterDeserialization(
-      processSpecialsAfterDeserialization(
-        processSpecialsAfterDeserialization(state, boolKeys, deserializeBool),
-        numberKeys,
-        deserializeNumber,
-      ),
-      jsonKeys,
-      deserializeJSONString,
+    return deserializatonParams.reduce(
+      (latestState, { targetKeys, op }) =>
+        processSpecialsAfterDeserialization(latestState, targetKeys, op),
+      state,
     );
   }
 
   // params: Record<string, unknown>
   function saveToPersistence(params) {
-    var dictCopy = prepareSpecialsForSerialization(
-      prepareSpecialsForSerialization(
-        cloneDeep(params),
-        boolKeys,
-        serializeBool,
-      ),
-      jsonKeys,
-      serializeJSONString,
+    var dictCopy = serializatonParams.reduce(
+      (latestState, { targetKeys, op }) =>
+        prepareSpecialsForSerialization(latestState, targetKeys, op),
+      cloneDeep(params),
     );
 
     var updatedURL =
@@ -103,7 +115,9 @@ export function URLStore({
   }
 
   function parseHashString(s) {
-    return qs.parse(s.slice(1), { decode: !!decoder, decoder });
+    const parsed = qs.parse(s.slice(1), { decode: !!decoder, decoder });
+    // debugger;
+    return parsed;
   }
 
   function clear() {
@@ -161,11 +175,31 @@ export function deserializeNumber(val) {
   }
   return false;
 }
+
+export function serializeNumber(val) {
+  return '' + val;
+}
+
 export function deserializeJSONString(s) {
-  if (s && typeof s === 'string') {
-    return JSON.parse(s);
+  if (!s || typeof s !== 'string') {
+    return s;
   }
-  return s;
+
+  const unescapedS = s
+    .replace(escapedAmpRegex, '&')
+    .replace(escapedEqRegex, '=')
+    .replace(escapedPlusRegex, '+');
+
+  // console.log('incoming string:', s, 'unescaped:', unescapedS);
+  return JSON.parse(unescapedS);
+}
+
+function deserializeJSONStringRaw(s) {
+  if (!s || typeof s !== 'string') {
+    return s;
+  }
+
+  return JSON.parse(s);
 }
 
 export function serializeJSONString(value) {
@@ -178,6 +212,13 @@ export function serializeJSONString(value) {
     .replace(ampRegex, '%26')
     .replace(eqRegex, '%3D')
     .replace(plusRegex, '%2B');
+}
+
+function serializeJSONStringRaw(value) {
+  if (value === undefined) {
+    return '';
+  }
+  return JSON.stringify(value);
 }
 
 function basicSort(a, b) {
